@@ -1,0 +1,453 @@
+
+<!DOCTYPE html>
+<html>
+    <head>
+        
+        <title>Quick Start - Leaflet</title>
+
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        <!--<link rel="shortcut icon" type="image/x-icon" href="docs/images/favicon.ico" />-->
+
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A==" crossorigin=""/>
+        <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
+
+        <style>
+            html
+            {
+                overflow: hidden;
+                background-color: black;
+            }
+            body
+            {
+                margin: 0;
+                padding: 0;
+            }
+            #map2 {
+                display: none;
+            }
+            #test1, #test2, #test3, #test4, #test5, #test6
+            {
+                display: none;
+            }
+            #none
+            {
+                margin-left: 8%;
+            }
+        </style>
+    </head>
+    <body>
+
+
+
+        <div id="map" style="width: 100%; height: 100vh; "></div>
+        <script>
+            var data = new Array();
+            var mymap = L.map('map').setView([46, 2], 5);
+            var nom = new Array();
+            
+            fetch('https://hubeau.eaufrance.fr/api/v1/hydrometrie/referentiel/stations?en_service=true&size=7000')
+            .then(res => res.json())
+            .then(data => affichecarte(data));
+            
+            
+            function affichecarte(data)
+            {
+                for (let i = 0; i<data['count']; i++)
+                {
+                    let lat = data['data'][i]['latitude_station'];
+                    let lon = data['data'][i]['longitude_station'];
+                    nom.push(new Array(data['data'][i]['libelle_station'], lat, lon));
+                    //console.log(lat, lon);
+                    L.circle([lat, lon], { color: 'blue', fillColor: 'blue', fillOpacity: 0.5, radius: 500 }).addTo(mymap).on('click', onClick);
+                    //L.marker([lat, lon]).addTo(mymap).on('click', onClick);
+                }   
+            }
+            //data['count']
+
+            L.tileLayer('https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoibWFwYm94IiwiYSI6ImNpejY4NXVycTA2emYycXBndHRqcmZ3N3gifQ.rJcFIG214AriISLbB6B5aw', {
+                maxZoom: 18,
+                id: 'mapbox/streets-v11',
+                tileSize: 512,
+                zoomOffset: -1
+            }).addTo(mymap);
+
+            function onClick(e) 
+            {
+                document.getElementById('map').style.display = 'none';
+                document.getElementById('map2').style.display = 'block';
+                
+                console.log(e.latlng.lat, e.latlng.lng);
+                function msToTime(duration) {
+                    var milliseconds = parseInt((duration % 1000) / 100),
+                        seconds = parseInt((duration / 1000) % 60),
+                        minutes = parseInt((duration / (1000 * 60)) % 60),
+                        hours = parseInt((duration / (1000 * 60 * 60)) % 24);
+
+                    hours = (hours < 10) ? "0" + hours : hours;
+                    minutes = (minutes < 10) ? "0" + minutes : minutes;
+                    seconds = (seconds < 10) ? "0" + seconds : seconds;
+
+                    return hours + ":" + minutes;
+                }
+                function cardinaux(deg)
+                {
+                    var point = 'N';
+                    if (deg>=348.75){point = 'N';}
+                    if (deg>=11.25){point = 'NNE';}
+                    if (deg>=33.75){point = 'NE';}
+                    if (deg>=56.25){point = 'ENE';}
+                    if (deg>=78.75){point = 'E';}
+                    if (deg>=101.25){point = 'ESE';}
+                    if (deg>=123.75){point = 'SE';}
+                    if (deg>=146.25){point = 'SSE';}
+                    if (deg>=168.75){point = 'S';}
+                    if (deg>=191.25){point = 'SSO';}
+                    if (deg>=213.75){point = 'SO';}
+                    if (deg>=236.25){point = 'OSO';}
+                    if (deg>=258.75){point = 'O';}
+                    if (deg>=281.25){point = 'ONO';}
+                    if (deg>=303.75){point = 'NO';}
+                    if (deg>=326.25){point = 'NNO';}
+                    return point;
+                }
+                var tablo = new Array();
+                tablo[0] = "zero";
+                tablo[1] = "un";
+                tablo[2] = "deux";
+                tablo[3] = "trois";
+                tablo[4] = "quatre";
+                tablo[5] = "cinq";
+                tablo[6] = "six";
+                var divis = new Array();
+                divis[0] = "#test0";
+                divis[1] = "#test1";
+                divis[2] = "#test2";
+                divis[3] = "#test3";
+                divis[4] = "#test4";
+                divis[5] = "#test5";
+                divis[6] = "#test6";
+                var json = new Array();
+                var posi = new Array();
+                posi.push(new Array(e.latlng.lat, e.latlng.lng))
+                let vrainom = '';
+                fetch('https://api.openweathermap.org/data/2.5/onecall?lat='+e.latlng.lat+'&lon='+e.latlng.lng+'&units=metric&exclude=current,minutely,hourly,alerts&appid=a866a2353a9d3a2375bec487528d1524&lang=fr')
+                .then((response) =>  {
+
+                    const userData = response.json();
+                    const lat = e.latlng.lat;
+                    const lon = e.latlng.lng;
+                    
+                    for (let m=0; m<nom.length; m++)
+                    {
+                        if ((posi[0][0] == nom[m][1]) && (posi[0][1] == nom[m][2]))
+                        {
+                            vrainom = nom[m][0];
+                        }
+                    }
+                    let affichedate = ``;
+                    var iden = new Array();
+                    iden[0] = "none";
+                    iden[1] = "first";
+                    iden[2] = "second";
+                    iden[3] = "third";
+                    iden[4] = "fifth";
+                    iden[6] = "sixth";
+                    
+                    for (let l=0; l<7; l++)
+                    {
+                        let maintenant = new Date;
+                        let date = new Date(maintenant.getTime()+86400000*l);
+                        
+                        affichedate += `<button id="${iden[l]}" value="${l}" style="width: 12%; height: 30px; border: none; background-color: transparent; color: white" onmouseover="test(this.value)">${date.toLocaleString('fr-FR',
+                            {
+                                weekday: 'long',
+                                month: 'long',
+                                day: 'numeric',
+                                
+                            })}</button>`;
+                        document.querySelector('#menu').innerHTML = affichedate;
+                    }
+                    var datetest = new Array();
+                    let tz = "";
+                    var idsolu = new Array();
+                    idsolu[0] = "solu0";
+                    idsolu[1] = "solu1";
+                    idsolu[2] = "solu2";
+                    idsolu[3] = "solu3";
+                    idsolu[4] = "solu4";
+                    idsolu[5] = "solu5";
+                    idsolu[6] = "solu6";
+
+                    var idsolu2 = new Array();
+                    idsolu2[0] = "#solu0";
+                    idsolu2[1] = "#solu1";
+                    idsolu2[2] = "#solu2";
+                    idsolu2[3] = "#solu3";
+                    idsolu2[4] = "#solu4";
+                    idsolu2[5] = "#solu5";
+                    idsolu2[6] = "#solu6";
+
+                    for (let p=0; p<7; p++)
+                    {
+                        let maintenant = new Date;
+                        let date = new Date(maintenant.getTime()+86400000*p);
+                        var day = date.getDate() + "";
+                        var month = (date.getMonth()+1) + "";
+                        var annee = date.getFullYear() + "";
+                        day = checkZero(day);
+                        month = checkZero(month);
+                        annee = checkZero(annee);
+                        function checkZero(data)
+                        {
+                            if(data.length == 1)
+                            {
+                                data = "0" + data;
+                            }
+                            return data;
+                        }
+                        datetest.push(annee + "" + month + "" + day);
+                        userData.then((utilisateur) => {
+                        const date1 = new Date(utilisateur['daily'][p]['sunrise']);
+                        tz = utilisateur['timezone_offset'];
+                        
+                        
+                        let affichage = ``;
+                        affichage += `<table  style="width: 100%; border-collapse: collapse; height: 80vh">
+                                            <h2 id="datedujour" style="font-style: italic; text-align: center; color: white;"> ${vrainom}</h2>
+                                            <tr>
+                                                <td style="width: 20%; font-style: italic; text-align: center; color: white;"><h3>Ephémeride</h3></td>
+                                                <td style="width: 20%; font-style: italic; text-align: center; color: white;"><h3>Météo</h3></td>
+                                                <td style="width: 20%; font-style: italic; text-align: center; color: white;"><h3>Pluie</h3></td>
+                                                <td style="width: 20%; font-style: italic; text-align: center; color: white;"><h3>Vent</h3></td>
+                                                <td style="width: 20%; font-style: italic; text-align: center; color: white;"><h3>Lune</h3></td>
+                                            </tr>
+                                            <tr style="height: 35vh;">
+                                                <td style="text-align: center; color: white; width: 20%;">
+                                                    <p>Lever de soleil: ${utilisateur['daily'][p]['sunrise']} </p>
+                                                    <p>Coucher de soleil: ${utilisateur['daily'][p]['sunset']} </p>
+                                                    <p>Pêche possible de </p>
+                                                </td>
+                                                <td style="text-align: center; color: white; width: 20%;">
+                                                    <p>Température: ${utilisateur['daily'][p]['temp']['day']}°C</p>
+                                                    <p>Ressenti: ${utilisateur['daily'][p]['feels_like']['day']}°C</p>
+                                                    <p>Température mini: ${utilisateur['daily'][p]['temp']['min']}°C</p>
+                                                    <p>Température maxi: ${utilisateur['daily'][p]['temp']['max']}°C</p>
+                                                    <p>Pression Atmosphérique: ${utilisateur['daily'][p]['pressure']}hPa</p>
+                                                    <p>Couverture Nuageuse: ${utilisateur['daily'][p]['clouds']}%</p>
+                                                    <p>Indice UV: ${utilisateur['daily'][p]['uvi']}%</p>
+                                                </td>
+                                                <td style="text-align: center; color: white; width: 20%;">
+                                                    <p>Probabilité de pluie: ${utilisateur['daily'][p]['pop']*100}%</p>
+                                                    <p>Pluie: ${utilisateur['daily'][p]['rain']}mm</p>
+                                                    <p>Humidité: ${utilisateur['daily'][p]['humidity']}%</p>
+                                                    <p>Point de rosé: ${utilisateur['daily'][p]['dew_point']}°C</p>
+                                                </td>
+                                                <td style="text-align: center; color: white; width: 20%;">
+                                                    <p>Direction: ${cardinaux(utilisateur['daily'][p]['wind_deg'])}</p>
+                                                    <p>Vitesse du vent: ${Math.round(utilisateur['daily'][p]['wind_speed']*3.6)}km/h</p>
+                                                    <p>Rafales: ${Math.round(utilisateur['daily'][p]['wind_gust']*3.6)}km/h</p>
+                                                </td>
+                                                <td id="${idsolu[p]}" style="text-align: center; color: white; width: 20%;">
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <td colspan='5' style="color: white;">
+                                                    <div style="width: 50%; height: 22vh; position: float; float: left;">
+                                                        <img style="margin-left: 80%;" src="http://openweathermap.org/img/wn/${utilisateur['daily'][p]['weather'][0]['icon']}@2x.png">
+                                                    </div>
+                                                    <div style="width: 50%; height: 22vh; position: float; float: left;">
+                                                        <p style="margin-top: 5vh;">${utilisateur['daily'][p]['weather'][0]['description']}</p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>`;
+                            document.querySelector(divis[p]).innerHTML = affichage;
+                        });
+                    }
+                    for (let a=0; a<7; a++)
+                    {
+                        fetch(`https://api.solunar.org/solunar/${lat},${lon},${datetest[a]},${tz}`)
+                        .then((response) =>  {
+                            const usersDataSol = response.json();
+                            usersDataSol.then((meteo) => {
+
+                                var heurelever = meteo['moonRise'];
+                                var heureleve = heurelever.split(":");
+                                let heurelv = heureleve[0]-tz+1;
+
+
+                                var heurecoucher = meteo['moonSet'];
+                                var heurecouche = heurecoucher.split(":");
+                                let heurech = heurecouche[0]-tz+1;
+
+
+                                var pourcentage = meteo['moonIllumination']*100;
+
+
+                                var nomfr = new Array();
+                                nomfr[0] = "Nouvelle Lune";
+                                nomfr[1] = "Premier Croissant";
+                                nomfr[2] = "Premier Quartier";
+                                nomfr[3] = "Lune Gibbeuse Croissante";
+                                nomfr[4] = "Pleine Lune";
+                                nomfr[5] = "Lune Gibbeuse Décroissante";
+                                nomfr[6] = "Dernier Quartier";
+                                nomfr[7] = "Dernier Croissant";
+
+                                var nomag = new Array();
+                                nomag[0] = "New Moon";
+                                nomag[1] = "Waxing Crescent";
+                                nomag[2] = "First Quarter";
+                                nomag[3] = "Waxing Gibbous";
+                                nomag[4] = "Full Moon";
+                                nomag[5] = "Waning Gibbous";
+                                nomag[6] = "Third Quarter";
+                                nomag[7] = "Waning Crescent";
+
+                                var lune = '';
+                                for (let r=0; r<8; r++)
+                                {
+                                    if(meteo['moonPhase'] == nomag[r])
+                                    {
+                                        lune = nomfr[r];
+                                    }
+                                }
+                                var val = new Array();
+                                val[0] = heurelv;
+                                val[1] = heureleve[1];
+                                val[2] = heurech;
+                                val[3] = heurecouche[1];
+                                val[4] = pourcentage;
+                                val[5] = lune;
+                                let affichesolu = ``;
+                                affichesolu += `<p>Lever de lune: ${meteo['moonRise']}</p>
+                                                <p>Coucher de lune: ${meteo['moonSet']}</p>
+                                                <p>${Math.round(pourcentage)}% - ${lune}</p>`;
+                                
+                                document.querySelector(idsolu2[a]).innerHTML = affichesolu;
+
+
+                            });
+                        })
+                    }
+                    
+                })
+                
+                
+                
+                        
+            }
+            
+
+        </script>
+
+
+        <div id="map2" style="width: 100%; height: 100vh; ">
+            <button style="border-radius: 50px; border: none; width: 20%; height: 5vh; margin-left: 40%; margin-top: 2%;" onmouseover="viewcard()">Voir carte</button>
+            <div id="menu" style="margin-top: 1%; width: 100%; background: radial-gradient(circle at 14%, rgba(91,43,194,1) 0%, rgba(0,0,0,1) 50%, rgba(0,0,0,1) 100%);">
+                <script>
+                    function test(num)
+                    {					
+                        switch(num)
+                        {
+                            case '0': 	document.getElementById('test0').style.display = 'block';
+                                        document.getElementById('test1').style.display = 'none';
+                                        document.getElementById('test2').style.display = 'none';
+                                        document.getElementById('test3').style.display = 'none';
+                                        document.getElementById('test4').style.display = 'none';
+                                        document.getElementById('test5').style.display = 'none';
+                                        document.getElementById('test6').style.display = 'none';
+                                        document.getElementById('menu').style.backgroundImage = 'radial-gradient(circle at 14%, rgba(91,43,194,1) 0%, rgba(0,0,0,1) 50%, rgba(0,0,0,1) 100%)';
+                                        break;
+                            case '1': 	document.getElementById('test0').style.display = 'none';
+                                        document.getElementById('test1').style.display = 'block';
+                                        document.getElementById('test2').style.display = 'none';
+                                        document.getElementById('test3').style.display = 'none';
+                                        document.getElementById('test4').style.display = 'none';
+                                        document.getElementById('test5').style.display = 'none';
+                                        document.getElementById('test6').style.display = 'none';
+                                        document.getElementById('menu').style.backgroundImage = 'radial-gradient(circle at 26%, rgba(91,43,194,1) 0%, rgba(0,0,0,1) 50%, rgba(0,0,0,1) 100%)';
+                                        break;											
+                            case '2': 	document.getElementById('test0').style.display = 'none';
+                                        document.getElementById('test1').style.display = 'none';
+                                        document.getElementById('test2').style.display = 'block';
+                                        document.getElementById('test3').style.display = 'none';
+                                        document.getElementById('test4').style.display = 'none';
+                                        document.getElementById('test5').style.display = 'none';
+                                        document.getElementById('test6').style.display = 'none';	
+                                        document.getElementById('menu').style.backgroundImage = 'radial-gradient(circle at 38%, rgba(91,43,194,1) 0%, rgba(0,0,0,1) 50%, rgba(0,0,0,1) 100%)';
+                                        break;
+                            case '3': 	document.getElementById('test0').style.display = 'none';
+                                        document.getElementById('test1').style.display = 'none';
+                                        document.getElementById('test2').style.display = 'none';
+                                        document.getElementById('test3').style.display = 'block';
+                                        document.getElementById('test4').style.display = 'none';
+                                        document.getElementById('test5').style.display = 'none';
+                                        document.getElementById('test6').style.display = 'none';
+                                        document.getElementById('menu').style.backgroundImage = 'radial-gradient(circle at 50%, rgba(91,43,194,1) 0%, rgba(0,0,0,1) 50%, rgba(0,0,0,1) 100%)';
+                                        break;
+                            case '4': 	document.getElementById('test0').style.display = 'none';
+                                        document.getElementById('test1').style.display = 'none';
+                                        document.getElementById('test2').style.display = 'none';
+                                        document.getElementById('test3').style.display = 'none';
+                                        document.getElementById('test4').style.display = 'block';
+                                        document.getElementById('test5').style.display = 'none';
+                                        document.getElementById('test6').style.display = 'none';
+                                        document.getElementById('menu').style.backgroundImage = 'radial-gradient(circle at 62%, rgba(91,43,194,1) 0%, rgba(0,0,0,1) 50%, rgba(0,0,0,1) 100%)';
+                                        break;
+                            case '5': 	document.getElementById('test0').style.display = 'none';
+                                        document.getElementById('test1').style.display = 'none';
+                                        document.getElementById('test2').style.display = 'none';
+                                        document.getElementById('test3').style.display = 'none';
+                                        document.getElementById('test4').style.display = 'none';
+                                        document.getElementById('test5').style.display = 'block';
+                                        document.getElementById('test6').style.display = 'none';
+                                        document.getElementById('menu').style.backgroundImage = 'radial-gradient(circle at 74%, rgba(91,43,194,1) 0%, rgba(0,0,0,1) 50%, rgba(0,0,0,1) 100%)';
+                                        break;
+                            case '6': 	document.getElementById('test0').style.display = 'none';
+                                        document.getElementById('test1').style.display = 'none';
+                                        document.getElementById('test2').style.display = 'none';
+                                        document.getElementById('test3').style.display = 'none';
+                                        document.getElementById('test4').style.display = 'none';
+                                        document.getElementById('test5').style.display = 'none';
+                                        document.getElementById('test6').style.display = 'block';
+                                        document.getElementById('menu').style.backgroundImage = 'radial-gradient(circle at 86%, rgba(91,43,194,1) 0%, rgba(0,0,0,1) 50%, rgba(0,0,0,1) 75%, rgba(0,0,0,1) 100%)';
+                                        break;
+                        }
+                    }
+                </script>
+            </div>
+            <div id="test0" style="margin-top: 2%; border: 1px solid white; background-color: #5B2BC2; width: 60%; margin-left:20%; border-radius: 50px; height: 80vh;">
+                
+            </div>
+            <div id="test1" style="margin-top: 2%; border: 1px solid white; background-color: #5B2BC2; width: 60%; margin-left:20%; border-radius: 50px; height: 80vh;">
+                
+            </div>
+            <div id="test2" style="margin-top: 2%; border: 1px solid white; background-color: #5B2BC2; width: 60%; margin-left:20%; border-radius: 50px; height: 80vh;">
+                
+            </div>
+            <div id="test3" style="margin-top: 2%; border: 1px solid white; background-color: #5B2BC2; width: 60%; margin-left:20%; border-radius: 50px; height: 80vh;">
+                
+            </div>
+            <div id="test4" style="margin-top: 2%; border: 1px solid white; background-color: #5B2BC2; width: 60%; margin-left:20%; border-radius: 50px; height: 80vh;">
+                
+            </div>
+            <div id="test5" style="margin-top: 2%; border: 1px solid white; background-color: #5B2BC2; width: 60%; margin-left:20%; border-radius: 50px; height: 80vh;">
+                
+            </div>
+            <div id="test6" style="margin-top: 2%; border: 1px solid white; background-color: #5B2BC2; width: 60%; margin-left:20%; border-radius: 50px; height: 80vh;">
+                
+            </div>
+            
+            <script>
+                function viewcard() 
+                {
+                    document.getElementById('map').style.display = 'block';
+                    document.getElementById('map2').style.display = 'none';
+                }
+            </script>
+        </div>
+    </body>
+</html>
